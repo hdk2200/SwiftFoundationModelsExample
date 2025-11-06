@@ -8,9 +8,14 @@ import FoundationModels
 struct GenerativeView: View {
   private var model = SystemLanguageModel.default
 
-  @State private var prompt: String = "prompt"
-  @State private var output: String = "output"
-  @State private var session = LanguageModelSession()
+  @State private var prompt: String = "Write me a story about coffee."
+  @State private var output: String = ""
+  @State private var session:LanguageModelSession? = nil
+  @State private var  instructions = """
+      Suggest related topics. Keep them concise (three to seven words) and make sure they \
+      build naturally from the person's topic.
+      """
+
   @State private var isGenerating = false
   @State private var errorMessage: String? = nil
   
@@ -85,6 +90,13 @@ struct GenerativeView: View {
     isGenerating = true
     defer { isGenerating = false }
 
+    if session == nil {
+      session = LanguageModelSession(instructions: instructions)
+    }
+
+    guard let session = session else {
+      return
+    }
     do {
       // Create session options as needed. Adjust to your API surface if different.
 //      var options = InferenceOptions()
